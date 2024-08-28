@@ -1,3 +1,4 @@
+import { User } from '@/lib/interface/IUser';
 import { userService } from '@/lib/services/users';
 import { Add } from '@mui/icons-material';
 import {
@@ -9,15 +10,29 @@ import {
   TableRow,
 } from '@mui/material';
 import { useMemo } from 'react';
+import { useMutation, useQueryClient } from 'react-query';
 
 const HomePage = () => {
-  const { getUsers } = userService();
+  const queryClient = useQueryClient();
+  const { getUsers, createUser } = userService();
   const { data: usersData } = getUsers();
+  const { mutateAsync: createUserMutation } = useMutation(createUser);
 
   const users = useMemo(
     () => (usersData && usersData.users ? usersData.users : []),
     [usersData],
   );
+
+  const handleCreateUser = (user: User) => {
+    createUserMutation(user, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['users'] });
+      },
+      onError: (error: unknown) => {
+        console.log('error', error);
+      },
+    });
+  };
 
   return (
     <div className="flex items-center justify-center w-full">

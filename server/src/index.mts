@@ -70,3 +70,13 @@ app.listen(port, () => {
 app.get("/api/users", (_: express.Request, response: express.Response) => {
   return response.status(200).send({ success: true, users });
 });
+
+app.post(
+  "/api/users",
+  (request: express.Request, response: express.Response) => {
+    const user = request.body as User;
+    users.push(user);
+    fs.writeFileSync(users_json_path, JSON.stringify(users));
+    return response.status(200).send({ success: true, user });
+  },
+);
