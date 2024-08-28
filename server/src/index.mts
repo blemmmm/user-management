@@ -3,7 +3,15 @@
 import body_parser from "body-parser";
 import cors from "cors";
 import express from "express";
+import fs from "node:fs";
+import path from "node:path";
 import * as os from "os";
+
+const users_json_path = path.join(process.cwd(), "/temp/users.json");
+
+if (!fs.existsSync(users_json_path)) {
+  fs.writeFileSync(users_json_path, JSON.stringify([]));
+}
 
 const app = express();
 const port = process.env.PORT || 8080;
