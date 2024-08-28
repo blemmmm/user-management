@@ -1,0 +1,45 @@
+services:
+  client:
+    build:
+      context: ./ # path of root directory; don't change.
+      dockerfile: ./client/Dockerfile # path relative to root directory.
+    restart: "no"
+    ports:
+      - 127.0.0.1:3000:3000
+    networks:
+      - example-network
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: ./ # path of root directory; don't change.
+      dockerfile: ./server/Dockerfile # path relative to root directory.
+    restart: "no"
+    ports:
+      - 127.0.0.1:8080:8080
+    networks:
+      - example-network
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+    volumes:
+      - ./caddy/config:/config
+      - ./caddy/data:/data
+      - ./caddy/logs:/var/log/caddy/
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - example-network
+    depends_on:
+      - server
+
+networks:
+  example-network:
+    name: example-network
